@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tech Hubs Utilization Dashboard | [Your Name]</title>
+<meta name="description" content="Interactive dashboard tracking daily attendance and weekly utilization of two tech hubs, by day type, program and learner status. Built with sample data.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tech Hubs Utilization Dashboard | [Your Name]">
+<meta property="og:description" content="Interactive dashboard tracking daily attendance and weekly utilization of two tech hubs. Built with sample data.">
+<!-- Add a 1200x630 screenshot named preview.png to your repo, then fix this URL -->
+<meta property="og:image" content="https://YOUR-USERNAME.github.io/YOUR-REPO/preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;1,700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#202124;--panel:#2a2b2e;--ink:#e8eaed;--mut:#9aa0a6;--line:#3c4043;--blue:#1a73e8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Open Sans",system-ui,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:32px 20px 70px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start}
+h1{font:700 1.5rem "Montserrat",sans-serif;margin:0}
+.badge{border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.8rem;color:var(--mut)}
+.sub{color:var(--mut);margin:6px 0 0;max-width:70ch}
+h2{font:italic 700 1.25rem "Montserrat",sans-serif;color:var(--blue);text-align:center;margin:54px 0 12px}
+h2.w{color:#fff;font-style:normal}
+h3.gw{font:700 1rem "Montserrat",sans-serif;text-align:center;margin:30px 0 4px}
+.box{height:300px;position:relative}
+.ctl{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.gauges svg{width:100%;height:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--panel);border-radius:10px;padding:12px 16px}
+.kpi span{font-size:.8rem;color:var(--mut)}
+.kpi b{display:block;font:600 1.7rem "Montserrat",sans-serif}
+.tw{overflow-x:auto;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:560px}
+th{background:#263238;text-align:right;padding:8px 10px;font-weight:600}
+td{text-align:right;padding:8px 10px}
+th:first-child,td:first-child{text-align:left}
+tbody tr:nth-child(odd){background:#1565c0}
+.pg{text-align:right;color:var(--mut);font-size:.8rem;padding:6px 2px}
+.about{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:26px;margin-top:50px}
+.about h3{font:700 1rem "Montserrat",sans-serif;margin:0 0 6px}
+.about p,.about li{color:#c4c7ca}
+.about ul{padding-left:1.1em;margin:0}
+.note{margin-top:46px;border-top:1px solid var(--line);padding-top:14px;color:var(--mut);font-size:.85rem}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+  <div>
+    <h1>Tech Hubs Utilization Dashboard</h1>
+    <p class="sub">Daily attendance and weekly utilization for two hubs, by day type, program and learner status. By [Your Name]. Originally built by a colleague; I now own and maintain it, and I added [your new features]. Built with Looker Studio and Google Sheets.</p>
+  </div>
+  <span class="badge">Sample data, no real learner information</span>
+</header>
+
+<h2>TECH HUBS, DAILY ATTENDANCE (Tue - Fri)</h2>
+<div class="box"><canvas id="d1" role="img" aria-label="Daily attendance Tuesday to Friday for two hubs"></canvas></div>
+<h2>TECH HUBS, DAILY ATTENDANCE (Sat)</h2>
+<div class="box"><canvas id="d2" role="img" aria-label="Saturday attendance for two hubs"></canvas></div>
+<h2>TECH HUBS, DAILY ATTENDANCE (Sun)</h2>
+<div class="box"><canvas id="d3" role="img" aria-label="Sunday attendance for two hubs"></canvas></div>
+<h2>CUMULATIVE</h2>
+<div class="box"><canvas id="d4" role="img" aria-label="Total daily attendance across both hubs"></canvas></div>
+
+<h2 class="w">2026 Hub Attendance Graph</h2>
+<div class="box"><canvas id="h1" role="img" aria-label="2026 hub attendance"></canvas></div>
+<h2 class="w">2024/25 Hub Attendance Graph</h2>
+<div class="box"><canvas id="h2" role="img" aria-label="2024 to 2025 hub attendance"></canvas></div>
+<h2 class="w">2023/24 Hub Attendance Graph</h2>
+<div class="box"><canvas id="h3" role="img" aria-label="2023 to 2024 hub attendance"></canvas></div>
+
+<h2 class="w">Weekly Hub Attendance Breakdown by Programs</h2>
+<div class="box" style="height:420px"><canvas id="p1" role="img" aria-label="Stacked horizontal bars of weekly attendance by program"></canvas></div>
+
+<h2 class="w">Weekly Hub Attendance Breakdown by Graduation Status</h2>
+<div class="box"><canvas id="g1" role="img" aria-label="Weekly attendance for active learners and graduates"></canvas></div>
+<h2 class="w">Unique Attendees: Weekly Hub Attendance Breakdown by Graduation Status</h2>
+<div class="box"><canvas id="g2" role="img" aria-label="Unique weekly attendees for active learners and graduates"></canvas></div>
+
+<div id="events"></div>
+
+<h2 class="w">Weekly Hub Utilization</h2>
+<div id="gauges"></div>
+
+<div class="about">
+  <div><h3>The problem</h3><p>[Who needed this and what they could not see before. Example: leadership could not tell whether hub capacity matched demand.]</p>
+  <h3 style="margin-top:14px">Impact</h3><p>[Decisions this informed. Delete this if you have no real outcome.]</p></div>
+  <div><h3>What I took over</h3><ul><li>Daily attendance by day type and hub</li><li>Weekly utilization gauges for weekdays, Saturday and Sunday</li><li>Attendance by program and by graduation status</li></ul>
+  <h3 style="margin-top:14px">What I added</h3><ul><li>[Feature 1, e.g. event attendance split by attendee type]</li><li>[Feature 2, e.g. unique attendees view]</li><li>[Fixes, e.g. cleaner Google Sheets data feed or refreshed layout]</li></ul></div>
+</div>
+<p class="note">All figures are generated sample data modeled on a real hub-utilization use case. The original dashboard was built by a colleague; this page is my own sample-data recreation. Contact: [LinkedIn or email].</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+var r=rng(11),K=['#1a73e8','#00b8c8','#f0049a','#ff6d00','#ffab00','#7cb342','#673ab7'];
+function fmt(d){return d.toLocaleDateString('en',{month:'short',day:'numeric'})}
+function fmtY(d){return d.toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'})}
+Chart.defaults.color='#bdc1c6';Chart.defaults.borderColor='#3c4043';
+Chart.defaults.font.family='"Open Sans",system-ui,sans-serif';
+var gx={ticks:{maxTicksLimit:12},grid:{display:false}};
+function ds(l,d,c){return{label:l,data:d,borderColor:c,backgroundColor:c,tension:.35,pointRadius:0,borderWidth:2}}
+function line(id,labels,sets,ymax){new Chart(document.getElementById(id),{type:'line',data:{labels:labels,datasets:sets},options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:gx,y:{beginAtZero:true,max:ymax}},plugins:{legend:{position:'top'}}}})}
+
+// 1. Daily attendance by day type + cumulative
+var L1=[],a1=[],b1=[],L2=[],a2=[],b2=[],L3=[],a3=[],b3=[],LC=[],tc=[],i=0,c0=new Date(2026,2,3);
+for(var d=new Date(2026,2,1);d<=new Date(2026,9,25);d.setDate(d.getDate()+1)){
+  var g=d.getDay(),t=Math.max(0,(d-c0)/2.2e10),a,b,ok=true;
+  if(g>=2&&g<=5){a=Math.round(75+t*55+r()*24-(r()<.04?40:0));b=Math.round(a*.55+r()*14);L1.push(fmt(d));a1.push(a);b1.push(b)}
+  else if(g===6){i++;a=Math.round(70+r()*50+(i===13?290:0));b=Math.round(a*.45+r()*10);L2.push(fmt(d));a2.push(a);b2.push(b)}
+  else if(g===0){a=Math.round(40+r()*30+t*10);b=Math.round(a*.6+r()*8);L3.push(fmt(d));a3.push(a);b3.push(b)}
+  else ok=false;
+  if(ok){LC.push(fmt(d));tc.push(a+b)}
+}
+line('d1',L1,[ds('Hub A',a1,K[0]),ds('Hub B',b1,K[1])],200);
+line('d2',L2,[ds('Hub A',a2,K[0]),ds('Hub B',b2,K[1])],500);
+line('d3',L3,[ds('Hub A',a3,K[0]),ds('Hub B',b3,K[1])],100);
+line('d4',LC,[ds('Total',tc,K[0])],500);
+
+// 2. Hub attendance by period
+function span(id,from,to,step,base,grow){
+  var L=[],V=[],n=(to-from)/864e5/step,j=0;
+  for(var d=new Date(from);d<=to;d.setDate(d.getDate()+step),j++){L.push(fmtY(d));V.push(Math.round(base+grow*j/n+r()*60+(r()<.04?r()*300:0)))}
+  line(id,L,[ds('# of Attendees',V,K[0])]);
+}
+span('h1',new Date(2026,0,1),new Date(2026,9,25),1,70,40);
+span('h2',new Date(2024,0,9),new Date(2025,11,28),2,40,110);
+span('h3',new Date(2023,4,1),new Date(2024,8,30),2,50,90);
+
+// 3. Programs
+var W=[],d0=new Date(2026,8,1);
+for(var k=0;k<8;k++){var s=new Date(d0);s.setDate(s.getDate()+k*7);var e=new Date(s);e.setDate(e.getDate()+5);W.push(fmt(s)+' - '+fmt(e))}
+var P=['Program A','Program B','Program C','Program D','Program E','Program F','Program G','Program H','Program I','Program J'],B=[150,90,65,55,45,40,35,25,15,8];
+new Chart(document.getElementById('p1'),{type:'bar',data:{labels:P,datasets:W.slice(0,6).map(function(w,j){return{label:'Week ('+w+')',backgroundColor:K[j%7],data:B.map(function(x){return Math.round(x*(.8+r()*.4))})}})},options:{indexAxis:'y',maintainAspectRatio:false,scales:{x:{stacked:true},y:{stacked:true,grid:{display:false}}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}}});
+
+// 4. Graduation status (total, then unique)
+var GW=W.slice(0,7),act=GW.map(function(){return Math.round(420+r()*130)}),gr=GW.map(function(){return Math.round(100+r()*75)});
+function grad(id,f){new Chart(document.getElementById(id),{type:'bar',data:{labels:['Active Learners','Graduated'],datasets:GW.map(function(w,j){return{label:'Week ('+w+')',backgroundColor:K[j],data:[Math.round(act[j]*f),Math.round(gr[j]*f)]}})},options:{maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true}},plugins:{legend:{position:'top',labels:{boxWidth:12}}}}})}
+grad('g1',1);grad('g2',.55);
+
+// 5. Events: 2026 (summary + chart), 2025 and 2024 (summary + table + chart)
+function sum(a,k){return a.reduce(function(p,c){return p+c[k]},0)}
+function events(yr,end,table){
+  var rows=[],d=new Date(yr,0,4);
+  while(d<=end){rows.push({d:new Date(d),ev:1+(r()<.25?Math.round(r()*2):0),a:Math.round(3+r()*30*(r()<.1?4:1)),m:Math.round(2+r()*25),n:Math.round(2+r()*45*(r()<.1?4:1))});d.setDate(d.getDate()+2+Math.round(r()*3))}
+  rows.forEach(function(x){x.t=x.a+x.m+x.n});
+  var id='ev'+yr,h='<h2 class="w">'+yr+' Event Attendance Graph</h2><div class="kpis">'
+   +[['Total # of Events',sum(rows,'ev')],['Total # of Attendees',sum(rows,'t')],['# of Active learner Attendees',sum(rows,'a')],['# of Alumni Attendees',sum(rows,'m')],['# Non-member Attendees',sum(rows,'n')]]
+    .map(function(k){return '<div class="kpi"><span>'+k[0]+'</span><b>'+k[1].toLocaleString()+'</b></div>'}).join('')+'</div>';
+  if(table){var last=rows.slice(-7).reverse();
+    h+='<div class="tw"><table><thead><tr><th>Date</th><th># of Events</th><th>Total # of Attendees</th><th># of Active learner Attendees</th><th># of Alumni Attendees</th><th># Non-member Attendees</th></tr></thead><tbody>'
+    +last.map(function(x){return '<tr><td>'+fmtY(x.d)+'</td><td>'+x.ev+'</td><td>'+x.t+'</td><td>'+x.a+'</td><td>'+x.m+'</td><td>'+x.n+'</td></tr>'}).join('')
+    +'</tbody></table><div class="pg">1 - 7 / '+rows.length+'</div></div>'}
+  h+='<div class="box"><canvas id="'+id+'" role="img" aria-label="'+yr+' event attendance"></canvas></div>';
+  document.getElementById('events').insertAdjacentHTML('beforeend',h);
+  line(id,rows.map(function(x){return fmt(x.d)}),[ds('Total # of Attendees',rows.map(function(x){return x.t}),K[0]),ds('# of Active learner Attendees',rows.map(function(x){return x.a}),K[1]),ds('# of Alumni Attendees',rows.map(function(x){return x.m}),K[2]),ds('# Non-member Attendees',rows.map(function(x){return x.n}),K[3])]);
+}
+events(2026,new Date(2026,9,25),false);events(2025,new Date(2025,11,28),true);events(2024,new Date(2024,11,28),true);
+
+// 6. Weekly hub utilization gauges (one row of three per week)
+function gauge(lbl,v){
+  var p=Math.min(v,1),R=80;
+  function pt(f,q){q=q||R;var a=Math.PI*(1-f);return[(100+q*Math.cos(a)).toFixed(1),(100-q*Math.sin(a)).toFixed(1)]}
+  var s=pt(0),en=pt(p),f=pt(1),t1=pt(.6,R-14),t2=pt(.6,R+14);
+  return '<svg viewBox="0 0 200 130" role="img" aria-label="'+lbl+' '+Math.round(v*100)+'%"><path d="M'+s+' A'+R+' '+R+' 0 0 1 '+f+'" fill="none" stroke="#3c4043" stroke-width="20"/>'
+  +(p>0?'<path d="M'+s+' A'+R+' '+R+' 0 0 1 '+en+'" fill="none" stroke="#1a73e8" stroke-width="20"/>':'')
+  +'<line x1="'+t1[0]+'" y1="'+t1[1]+'" x2="'+t2[0]+'" y2="'+t2[1]+'" stroke="#000" stroke-width="3"/>'
+  +'<text x="100" y="86" text-anchor="middle" font-size="9" fill="#bdc1c6">'+lbl+'</text>'
+  +'<text x="100" y="112" text-anchor="middle" font-size="26" fill="#fff" font-weight="600">'+Math.round(v*100)+'%</text></svg>';
+}
+var gh='';
+W.forEach(function(w,j){
+  var wk=.42+r()*.4,sa=j===1?0:(j===3?1.26:.3+r()*.95),su=j===1?0:.3+r()*.45;
+  gh+='<h3 class="gw">Weekly Hub Utilization ('+w+')</h3><div class="gauges">'+gauge('Weekdays Hub Utilization',wk)+gauge('Saturday Hub Utilization',sa)+gauge('Sunday Hub Utilization',su)+'</div>';
+});
+document.getElementById('gauges').innerHTML=gh;
+</script>
+</body>
+</html>
